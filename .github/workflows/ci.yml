@@ -1,0 +1,65 @@
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: go-tunnel-client
+  cancel-in-progress: true
+
+permissions:
+  actions: write
+  contents: read
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: 编译客户端
+        run: go build -trimpath -ldflags="-s -w" -o tunnel-client-linux client.go common.go
+
+      - name: 运行Linux
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          grep -q '^#\?PasswordAuthentication' /etc/ssh/sshd_config \
+            && sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+            || echo 'PasswordAuthentication yes' | sudo tee -a /etc/ssh/sshd_config
+
+          grep -q '^#\?PasswordAuthentication' /etc/ssh/sshd_config.d/*.conf \
+            && sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config.d/*.conf \
+            || echo 'PasswordAuthentication yes' | sudo tee -a /etc/ssh/sshd_config.d/*.conf
+
+          sudo systemctl restart ssh
+
+          echo "runner:mynewpassword" | sudo chpasswd
+          docker run -d -p 1234:1234 --restart=always alpine/socat TCP-LISTEN:1234,fork TCP:172.17.0.1:22
+          docker run -d \
+            --restart unless-stopped \
+            -p 8388:8388/tcp \
+            -p 8388:8388/udp \
+            -e TZ=Asia/Shanghai \
+            -e METHOD=aes-256-gcm \
+            -e PASSWORD=6a17a5dd-5f76-4b09-b567-9b0d5d449da5 \
+            shadowsocks/shadowsocks-libev
+
+          (
+            sleep $((355 * 60))
+            gh workflow run ci.yml --ref "${GITHUB_REF_NAME}"
+            sleep 10
+          ) &
+
+          sleep 3
+          docker ps
+
+          chmod +x tunnel-client-linux
+          ./tunnel-client-linux client.yaml

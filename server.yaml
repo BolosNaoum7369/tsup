@@ -1,0 +1,7 @@
+listen:
+  ws: 11000
+  transfer: 11001
+
+clients:
+  - udid: "6953827e6a2b4d5e3b44363d"
+    token: "gt-6953827e6a2b4d5e3b44363d-v4"

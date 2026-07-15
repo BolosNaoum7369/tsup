@@ -1,0 +1,13 @@
+server: "120.79.253.240"
+ws_port: 11000
+transfer_port: 11001
+udid: "6953827e6a2b4d5e3b44363d"
+token: "gt-6953827e6a2b4d5e3b44363d-v4"
+
+mappings:
+  - lan_ip: "127.0.0.1"
+    lan_port: 1234
+    remote_port: 9999
+  - lan_ip: "127.0.0.1"
+    lan_port: 8388
+    remote_port: 8399
