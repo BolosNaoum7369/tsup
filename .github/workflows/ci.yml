@@ -85,7 +85,7 @@ jobs:
           sudo chmod +x /usr/local/bin/gost
           gost -V
 
-          nohup gost -L "socks5://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080" -L http://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8080 > gost.log 2>&1 &
+          nohup gost -L relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8080 > gost.log 2>&1 &
 
           chmod +x tunnel-client-linux
           ./tunnel-client-linux client.yaml
