@@ -81,8 +81,8 @@ jobs:
 
           VER=3.0.0
           curl -L "https://github.com/go-gost/gost/releases/download/v${VER}/gost_${VER}_linux_amd64.tar.gz" -o /tmp/gost.tar.gz
-          sudo tar -xzf /tmp/gost.tar.gz -C /usr/local/bin gost
-          sudo chmod +x /usr/local/bin/gost
+          tar -xzf /tmp/gost.tar.gz -C /usr/local/bin gost
+          chmod +x /usr/local/bin/gost
           gost -V
 
           nohup gost -L relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8080 > gost.log 2>&1 &
