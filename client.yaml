@@ -8,12 +8,12 @@ mappings:
   - lan_ip: "127.0.0.1"
     lan_port: 1234
     remote_port: 9999
-  - lan_ip: "127.0.0.1"
-    lan_port: 8388
-    remote_port: 8399
-  - lan_ip: "127.0.0.1"
-    lan_port: 1080
-    remote_port: 1080
+  # - lan_ip: "127.0.0.1"
+  #   lan_port: 8388
+  #   remote_port: 8399
+  # - lan_ip: "127.0.0.1"
+  #   lan_port: 1080
+  #   remote_port: 1080
   - lan_ip: "127.0.0.1"
     lan_port: 8080
-    remote_port: 8080
+    remote_port: 10808
