@@ -11,7 +11,7 @@ import (
 const sessionIDLen = 36
 
 var (
-	udidRe  = regexp.MustCompile(`^[0-9a-f]{24}$`)
+	udidRe  = regexp.MustCompile(`^[0-9a-f]{1,128}$`)
 	tokenRe = regexp.MustCompile(`^[^\s]{1,128}$`)
 )
 
