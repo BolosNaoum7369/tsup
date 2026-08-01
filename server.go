@@ -239,16 +239,6 @@ func (s *tunnelServer) handleAdd(ws *wsConn, msg message) {
 		return
 	}
 
-	s.mu.Lock()
-	if prev := s.udidOwner[msg.Udid]; prev != 0 && prev != ws.owner {
-		if prevWS := s.owners[prev]; prevWS != nil && prevWS.conn != nil {
-			s.mu.Unlock()
-			ws.write(message{Type: msgError, Message: "udid busy"})
-			return
-		}
-	}
-	s.mu.Unlock()
-
 	s.claimUdid(msg.Udid, ws)
 
 	id := mappingID(msg.Udid, msg.LanIP, msg.LanPort)
