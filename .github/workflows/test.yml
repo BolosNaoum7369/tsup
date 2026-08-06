@@ -1,0 +1,92 @@
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: go-tunnel-client
+  cancel-in-progress: true
+
+permissions:
+  actions: write
+  contents: read
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  job:
+    # runs-on: ubuntu-latest
+    runs-on: self-hosted
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 恢复编译缓存
+        id: cache-client
+        uses: actions/cache/restore@v4
+        with:
+          path: tunnel-client-linux
+          key: tunnel-client-linux-${{ hashFiles('client.go', 'common.go', 'go.mod', 'go.sum') }}
+
+      - uses: actions/setup-go@v5
+        if: steps.cache-client.outputs.cache-hit != 'true'
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: 编译客户端
+        if: steps.cache-client.outputs.cache-hit != 'true'
+        run: go build -trimpath -ldflags="-s -w" -o tunnel-client-linux client.go common.go
+
+      - name: 保存编译缓存
+        if: steps.cache-client.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: tunnel-client-linux
+          key: tunnel-client-linux-${{ hashFiles('client.go', 'common.go', 'go.mod', 'go.sum') }}
+
+      - name: 运行Linux
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          grep -q '^#\?PasswordAuthentication' /etc/ssh/sshd_config \
+            && sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+            || echo 'PasswordAuthentication yes' | sudo tee -a /etc/ssh/sshd_config
+
+          grep -q '^#\?PasswordAuthentication' /etc/ssh/sshd_config.d/*.conf \
+            && sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config.d/*.conf \
+            || echo 'PasswordAuthentication yes' | sudo tee -a /etc/ssh/sshd_config.d/*.conf
+
+          sudo systemctl restart ssh
+
+          echo "runner:mynewpassword" | sudo chpasswd
+          docker run -d -p 1234:1234 --restart=always alpine/socat TCP-LISTEN:1234,fork TCP:172.17.0.1:22
+          docker run -d \
+            --restart unless-stopped \
+            -p 8388:8388/tcp \
+            -p 8388:8388/udp \
+            -e TZ=Asia/Shanghai \
+            -e METHOD=aes-256-gcm \
+            -e PASSWORD=6a17a5dd-5f76-4b09-b567-9b0d5d449da5 \
+            shadowsocks/shadowsocks-libev
+
+          (
+            sleep $((355 * 60))
+            gh workflow run ci.yml --ref "${GITHUB_REF_NAME}"
+            sleep 10
+          ) &
+
+          # cd sub2api
+          # docker compose up -d sub2api
+          # cd ..
+
+          VER=3.0.0
+          curl -L "https://github.com/go-gost/gost/releases/download/v${VER}/gost_${VER}_linux_amd64.tar.gz" -o /tmp/gost.tar.gz
+          tar -xzf /tmp/gost.tar.gz -C /usr/local/bin gost
+          chmod +x /usr/local/bin/gost
+          gost -V
+
+          nohup gost -L relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8080 > gost.log 2>&1 &
+
+          chmod +x tunnel-client-linux
+          ./tunnel-client-linux client.yaml
