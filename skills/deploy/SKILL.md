@@ -24,7 +24,9 @@ python <skill-dir>/scripts/deploy.py --source D:/workspace/go-tunnel
 Get-Command python, py -ErrorAction SilentlyContinue | Select-Object Name, Source
 ```
 
-若找到 `python`，运行 `python --version`；否则使用 `py --version`。版本为 3.10+ 时直接运行上面的 dry-run，通过后再部署。只有本机没有解释器或版本过低时，才配置/安装 Python。若配置工具无响应或返回 `cancelled`，不要据此声称用户取消，也不要连续重试同一个卡住的调用；如实说明工具未完成、部署脚本尚未运行及远端尚未修改。版本无法确认时停止，不要猜测部署状态。
+此脚本仅使用 Python 标准库。不要把 Python 环境配置或安装工具作为部署的默认前置步骤；必须先用上面的 PowerShell 命令检查本机解释器。若找到 `python`，运行 `python --version`；否则使用 `py --version`。版本为 3.10+ 时直接运行上面的 dry-run，通过后再部署。只有确认本机没有解释器或版本过低时，才配置/安装 Python。
+
+若确实需要配置工具但它无响应或返回 `cancelled`，不要据此声称用户取消，不要连续重试同一个卡住的调用；如实说明工具未完成、部署脚本尚未运行及远端尚未修改。版本无法确认时停止，不要猜测部署状态。
 
 `--dry-run` 只校验本地文件并列出清单，不访问网络，令牌缺失或为空时仍可预览。实际部署前需有效的 `GH_PAT`。不要输出令牌、把令牌放进命令参数，或从 Git remote、其他已登录账号替代读取。若文件为空，完成工具和本地检查后告知用户在本机填写，无需让用户在聊天中发送令牌。
 
