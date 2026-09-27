@@ -1,0 +1,30 @@
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+
+concurrency:
+  group: ci-watchdog
+  cancel-in-progress: false
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  ensure-ci-running:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check whether ci.yml is active
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          running=$(gh run list --workflow ci.yml --status in_progress --limit 1 --json databaseId --jq 'length')
+          queued=$(gh run list --workflow ci.yml --status queued --limit 1 --json databaseId --jq 'length')
+
+          if [ "$running" -gt 0 ] || [ "$queued" -gt 0 ]; then
+            echo "ci.yml is already running or queued; skipping."
+            exit 0
+          fi
+
+          echo "ci.yml is not active; starting a new run."
+          gh workflow run ci.yml --ref "$GITHUB_REF_NAME"
