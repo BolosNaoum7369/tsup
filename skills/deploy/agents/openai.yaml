@@ -1,0 +1,4 @@
+interface:
+  display_name: "部署"
+  short_description: "上传隧道客户端与工作流到 PAT 账号的 gost 仓库并配置密钥"
+  default_prompt: "使用 $deploy 将当前项目部署到 GH_PAT 所属账号的 gost 仓库。"
