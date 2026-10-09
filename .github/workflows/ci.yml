@@ -78,51 +78,28 @@ jobs:
 
           docker run -d \
             --restart unless-stopped \
-            -p 8080:8080 \
+            -p 8080:443 \
             gogost/gost:latest \
-            -L "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8080"
+            -L "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:443"
 
-          # VER=3.0.0
-          # curl -L "https://github.com/go-gost/gost/releases/download/v${VER}/gost_${VER}_linux_amd64.tar.gz" -o /tmp/gost.tar.gz
-          # tar -xzf /tmp/gost.tar.gz -C /usr/local/bin gost
-          # chmod +x /usr/local/bin/gost
-          # gost -V
-
-          # nohup gost -L relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8080 > gost.log 2>&1 &
-
-          
+          # 远程
+          # switchyard.proxy.rlwy.net:31990
           # docker run -d \
           #   --restart unless-stopped \
-          #   -p 1080:1080 \
+          #   -p 8443:443 \
           #   gogost/gost:latest \
-          #   -L "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080" \
-          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:10808"
-
-          # nohup gost -L relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:10808" > gost.log 2>&1 &
+          #   -L "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:443" \
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:10808"
           
-
+          # 本地
           # docker run -d \
-          #   --restart unless-stopped \
-          #   -p 1080:1080 \
-          #   gogost/gost:latest \
-          #   -L "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080" \
-          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@switchyard.proxy.rlwy.net:31990"
-
-          # nohup gost -L relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@switchyard.proxy.rlwy.net:31990" > gost.log 2>&1 &
-          
-          
-          # docker run -d \
-          #   --name gost-socks5 \
           #   --restart unless-stopped \
           #   -p 1080:1080 \
           #   gogost/gost:latest \
           #   -L "socks5://:1080" \
-          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:1080"
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:8443"
           
-          # gost -L socks5://:1081 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:1081"
-          # gost -L socks5://:1082 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:1082"
-
-
+          # 双端口
           # docker run -d \
           #   --restart unless-stopped \
           #   -p 1080:1080 \
@@ -130,16 +107,7 @@ jobs:
           #   gogost/gost:latest \
           #   -L "proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080" \
           #   -L "ss://chacha20-ietf-poly1305:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8388" \
-          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:10808"
-
-          # docker run -d \
-          #   --restart unless-stopped \
-          #   -p 1081:1080 \
-          #   -p 8398:8388 \
-          #   gogost/gost:latest \
-          #   -L "proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080" \
-          #   -L "ss://chacha20-ietf-poly1305:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8388" \
-          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@switchyard.proxy.rlwy.net:31990"
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:10808"
 
           chmod +x tunnel-client-linux
           ./tunnel-client-linux client.yaml
