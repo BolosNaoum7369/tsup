@@ -132,5 +132,14 @@ jobs:
           #   -L "ss://chacha20-ietf-poly1305:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8388" \
           #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:10808"
 
+          # docker run -d \
+          #   --restart unless-stopped \
+          #   -p 1081:1080 \
+          #   -p 8398:8388 \
+          #   gogost/gost:latest \
+          #   -L "proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080" \
+          #   -L "ss://chacha20-ietf-poly1305:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8388" \
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@switchyard.proxy.rlwy.net:31990"
+
           chmod +x tunnel-client-linux
           ./tunnel-client-linux client.yaml
