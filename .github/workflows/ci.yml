@@ -96,9 +96,9 @@ jobs:
           #   -p 1080:1080 \
           #   gogost/gost:latest \
           #   -L "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080" \
-          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:10808"
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:10808"
 
-          # nohup gost -L relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:10808" > gost.log 2>&1 &
+          # nohup gost -L relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:10808" > gost.log 2>&1 &
           
 
           # docker run -d \
@@ -117,10 +117,20 @@ jobs:
           #   -p 1080:1080 \
           #   gogost/gost:latest \
           #   -L "socks5://:1080" \
-          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:1080"
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:1080"
           
-          # gost -L socks5://:1081 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:1081"
-          # gost -L socks5://:1082 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:1082"
+          # gost -L socks5://:1081 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:1081"
+          # gost -L socks5://:1082 -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:1082"
+
+
+          # docker run -d \
+          #   --restart unless-stopped \
+          #   -p 1080:1080 \
+          #   -p 8399:8388 \
+          #   gogost/gost:latest \
+          #   -L "proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080" \
+          #   -L "ss://chacha20-ietf-poly1305:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8388" \
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@8.218.165.173:10808"
 
           chmod +x tunnel-client-linux
           ./tunnel-client-linux client.yaml
