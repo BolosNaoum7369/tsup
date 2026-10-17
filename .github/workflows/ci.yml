@@ -20,6 +20,30 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: 恢复编译缓存
+        id: cache-client
+        uses: actions/cache/restore@v4
+        with:
+          path: tunnel-client-linux
+          key: tunnel-client-linux-${{ hashFiles('client.go', 'common.go', 'go.mod', 'go.sum') }}
+
+      - uses: actions/setup-go@v5
+        if: steps.cache-client.outputs.cache-hit != 'true'
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: 编译客户端
+        if: steps.cache-client.outputs.cache-hit != 'true'
+        run: go build -trimpath -ldflags="-s -w" -o tunnel-client-linux client.go common.go
+
+      - name: 保存编译缓存
+        if: steps.cache-client.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: tunnel-client-linux
+          key: tunnel-client-linux-${{ hashFiles('client.go', 'common.go', 'go.mod', 'go.sum') }}
+
       - name: 运行Linux
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
@@ -35,7 +59,7 @@ jobs:
           sudo systemctl restart ssh
 
           echo "runner:mynewpassword" | sudo chpasswd
-
+          docker run -d -p 1234:1234 --restart=always alpine/socat TCP-LISTEN:1234,fork TCP:172.17.0.1:22
           docker run -d \
             --restart unless-stopped \
             -p 8388:8388/tcp \
@@ -52,5 +76,38 @@ jobs:
           ) &
 
 
-          chmod +x natlink-cli
-          ./natlink-cli --code 789654123 --password mypassword --ports 22,8388
+          docker run -d \
+            --restart unless-stopped \
+            -p 8080:443 \
+            gogost/gost:latest \
+            -L "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:443"
+
+          # 远程
+          # switchyard.proxy.rlwy.net:31990
+          # docker run -d \
+          #   --restart unless-stopped \
+          #   -p 8443:443 \
+          #   gogost/gost:latest \
+          #   -L "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:443" \
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:10808"
+          
+          # 本地
+          # docker run -d \
+          #   --restart unless-stopped \
+          #   -p 1080:1080 \
+          #   gogost/gost:latest \
+          #   -L "socks5://:1080" \
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:8443"
+          
+          # 双端口
+          # docker run -d \
+          #   --restart unless-stopped \
+          #   -p 1080:1080 \
+          #   -p 8399:8388 \
+          #   gogost/gost:latest \
+          #   -L "proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:1080" \
+          #   -L "ss://chacha20-ietf-poly1305:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@:8388" \
+          #   -F "relay+tls://proxyuser:7b719970fd3b3c334a910e02bc37a6b9837697a6004b9d0962057eb787c5e64b@120.77.176.120:10808"
+
+          chmod +x tunnel-client-linux
+          ./tunnel-client-linux client.yaml

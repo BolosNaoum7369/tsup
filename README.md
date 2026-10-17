@@ -54,14 +54,14 @@ mappings:
 
 ### 部署
 
-将 `.github` 和 `natlink-cli` 部署到 GitHub：在本地 `GH_PAT` 文件填入目标账号的 PAT，然后运行（需要 Python 3.10+ 和 GitHub CLI）：
+将客户端文件部署到 GitHub：在本地 `GH_PAT` 文件填入目标账号的 PAT，然后运行（需要 Python 3.10+ 和 GitHub CLI）：
 
 ```powershell
 python skills/deploy/scripts/deploy.py --source . --dry-run
 python skills/deploy/scripts/deploy.py --source .
 ```
 
-工具自动识别 PAT 账号并更新其 `gost` 仓库；不存在时 fork `go-gost/gost`（可用 `--upstream OWNER/REPO` 覆盖）。只上传根目录的 `natlink-cli` 和 `.github` 内的文件，保留远端其他文件，提交信息固定为 `Add files via upload`。提交前配置 Actions 仓库密钥 `GH_PAT`，令牌文件不上传。内容相同时只更新密钥，不创建空提交。`--dry-run` 仅检查本地文件，不访问 GitHub。
+工具自动识别 PAT 账号并更新其 `gost` 仓库；不存在时 fork `go-gost/gost`（可用 `--upstream OWNER/REPO` 覆盖）。只上传 `client.go`、`client.yaml`、`common.go`、`go.mod`、`go.sum` 和 `.github` 内的文件，保留远端其他文件，提交信息固定为 `Add files via upload`。提交前配置 Actions 仓库密钥 `GH_PAT`，令牌文件不上传。内容相同时只更新密钥，不创建空提交。`--dry-run` 仅检查本地文件，不访问 GitHub。
 
 可复用的 Codex skill 位于 [`skills/deploy`](skills/deploy/SKILL.md)。上传后在 GitHub Actions 手动运行 `ci.yml`；新 fork 可能需要先启用 Actions。
 
