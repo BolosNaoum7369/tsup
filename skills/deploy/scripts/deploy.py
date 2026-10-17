@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Upload the go-tunnel client snapshot to the PAT owner's gost repository."""
+"""Upload .github and natlink-cli to the PAT owner's gost repository."""
 
 import argparse
 import base64
@@ -18,7 +18,7 @@ import urllib.parse
 import urllib.request
 
 
-UPLOAD_FILES = ("client.go", "client.yaml", "common.go", "go.mod", "go.sum")
+UPLOAD_FILES = ("natlink-cli",)
 COMMIT_MESSAGE = "Add files via upload"
 
 

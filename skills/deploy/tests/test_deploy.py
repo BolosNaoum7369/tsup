@@ -72,13 +72,13 @@ class DeploymentTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name).resolve()
         for name in deploy.UPLOAD_FILES:
-            (self.root / name).write_bytes(b"client snapshot\r\n")
+            (self.root / name).write_bytes(b"natlink-cli snapshot\r\n")
         workflow = self.root / ".github" / "workflows"
         workflow.mkdir(parents=True)
         (workflow / "ci.yml").write_text("on: workflow_dispatch\n")
         (self.root / ".github" / ".hidden").write_text("included")
         (self.root / "GH_PAT").write_text(TOKEN)
-        (self.root / "server.go").write_text("excluded")
+        (self.root / "client.go").write_text("excluded")
         self.output = io.StringIO()
 
     def files(self):
@@ -91,17 +91,18 @@ class DeploymentTests(unittest.TestCase):
 
     def test_upload_scope_preserves_bytes_and_includes_hidden_files(self):
         files = self.files()
-        self.assertEqual(set(files), set(deploy.UPLOAD_FILES) | {".github/.hidden", ".github/workflows/ci.yml"})
-        self.assertEqual(files["client.go"], b"client snapshot\r\n")
+        self.assertEqual(set(files), {"natlink-cli", ".github/.hidden", ".github/workflows/ci.yml"})
+        self.assertEqual(files["natlink-cli"], b"natlink-cli snapshot\r\n")
+        self.assertNotIn("client.go", files)
 
     def test_missing_required_file_fails_before_network(self):
-        (self.root / "go.sum").unlink()
+        (self.root / "natlink-cli").unlink()
         with patch.object(deploy, "GitHub") as api, redirect_stderr(self.output):
             self.assertEqual(deploy.main(["--source", str(self.root)]), 1)
         api.assert_not_called()
 
     def test_token_inside_upload_is_blocked(self):
-        (self.root / "client.yaml").write_text("token: " + TOKEN)
+        (self.root / "natlink-cli").write_bytes(TOKEN.encode("ascii"))
         with self.assertRaises(deploy.DeployError) as exc:
             self.files()
         self.assertNotIn(TOKEN, str(exc.exception))
